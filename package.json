@@ -1,0 +1,27 @@
+{
+  "name": "jaeger-koa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/infrasrc/jaeger-koa.git"
+  },
+  "author": "Shani Heiman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/infrasrc/jaeger-koa/issues"
+  },
+  "homepage": "https://github.com/infrasrc/jaeger-koa#readme",
+  "dependencies": {
+    "bluebird": "^3.7.2",
+    "koa-compose": "^4.1.0",
+    "koa-router": "^8.0.6",
+    "lodash": "^4.17.15",
+    "opentracing": "^0.14.4",
+    "stream": "0.0.2"
+  }
+}
