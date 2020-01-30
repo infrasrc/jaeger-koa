@@ -66,7 +66,7 @@ class KoaJaeger {
     }
 
     handler(...args) {
-        const routerIndex           = _.findIndex(args, (arg) => (arg instanceof Router) ? true : false);
+        const routerIndex           = _.findIndex(args, (arg) => (arg.constructor.name === 'Router') ? true : false);
         const router                = args[routerIndex];
         let beforeMiddlewaresRouter = _.chain(args).slice(0, routerIndex).filter((arg) => (arg instanceof Function) ? true : false).value();
         let afterMiddlewaresRouter = _.chain(args).slice(routerIndex + 1).filter((arg) => (arg instanceof Function) ? true : false).value();
