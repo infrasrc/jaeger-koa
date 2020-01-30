@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/infrasrc/jaeger-koa#readme",
   "dependencies": {
-    "bluebird": "^3.7.2",
+    "jaeger-tracer": "git+https://github.com/infrasrc/jaeger-tracer.git",
     "koa-compose": "^4.1.0",
     "koa-router": "^8.0.6",
     "lodash": "^4.17.15",
