@@ -1,4 +1,4 @@
-const TEN_MINUTES_IN_MS = 10 * 60 * 1000;
+const TWO_HOURS_IN_MS = 2 * 60 * 60 * 1000;
 const _ = require('lodash');
 const compose = require('koa-compose');
 const { Readable } = require('stream');
@@ -40,20 +40,20 @@ const _getBody = (ctx) => {
 
 const _finishSpan = (ctx) => {
     const span = _.get(ctx, 'span', null);
-    if (!span) throw 'span not found';
     const spanTimeout = _.get(ctx, 'spanTimeout', null);
     if (spanTimeout) clearTimeout(spanTimeout);
-    span.finish();
-    delete ctx.span;
+    if (span) {
+        span.finish(); 
+        delete ctx.span;
+    }   
 }
 
 const _setTimeout = (ctx) => {
-    return new Promise((resolve) => {
-        ctx.spanTimeout = setTimeout(() => {
-            _finishSpan(ctx);
-            resolve('timeout');
-        }, TEN_MINUTES_IN_MS);
-    });
+    ctx.spanTimeout = setTimeout(() => {
+        const span = _.get(ctx, 'span', null);
+        if(span) span.setTag("span.timeout", true);
+        _finishSpan(ctx);
+    }, TWO_HOURS_IN_MS);
 }
 
 const _logError = (message, error) => {
@@ -116,9 +116,9 @@ class KoaJaeger {
 
             if (parentSpanContext) spanOptions.childOf = parentSpanContext;
 
-            _setTimeout(ctx);
-
             ctx.span = tracer.startSpan(name, spanOptions);
+
+            _setTimeout(ctx);
 
             ctx.span.setTag(Tags.SPAN_KIND, Tags.SPAN_KIND_RPC_SERVER);
 
@@ -158,7 +158,11 @@ class KoaJaeger {
     };
 }
 
+let _koa = null;
+
 module.exports = (Koa, Logger) => {
+    if(_koa) return _koa;
+    
     _logger = Logger;
 
     const emit = Koa.prototype.emit;
@@ -171,5 +175,7 @@ module.exports = (Koa, Logger) => {
 
     Koa.prototype.KoaJaeger = KoaJaeger;
 
-    return Koa;
+    _koa = Koa;
+
+    return _koa;
 }
