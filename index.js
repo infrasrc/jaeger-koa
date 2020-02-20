@@ -2,13 +2,10 @@ const TWO_HOURS_IN_MS = 2 * 60 * 60 * 1000;
 const _ = require('lodash');
 const compose = require('koa-compose');
 const { Readable } = require('stream');
-
 const Tracer = require('jaeger-tracer');
 const { Tags, FORMAT_HTTP_HEADERS, globalTracer } = Tracer.opentracing;
 const tracer = globalTracer();
 let _logger = null;
-
-if (!tracer) throw 'please set globalTracer before starting jaeger-koa';
 
 class StringStream extends Readable {
     constructor(str, options) {
@@ -89,13 +86,8 @@ class KoaJaeger {
         try {
             const span = _.get(ctx, 'span', null);
             if (!span) throw 'span not found';
-            span.setTag(Tags.ERROR, true);
             span.setTag(Tags.HTTP_STATUS_CODE, ctx.status);
-            span.log({
-                event: 'error',
-                message: error.message,
-                stack: error.stack
-            });
+            Tracer.logError(span, error);
             _finishSpan(ctx);
         } catch (error) {
             _logError(error.message, error);
